@@ -4,7 +4,7 @@ const { REST } = require("@discordjs/rest");
 const { Routes } = require("discord-api-types/v9");
 
 module.exports = {
-	name: "delete",
+	name: "deleteSlash",
 	description: "delete slash command",
 	category: "private",
 	args: true,

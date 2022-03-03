@@ -16,7 +16,7 @@ module.exports = {
 	once: true,
 	cooldown: 5,
 
-	async execute(message, args, guildSettings, Player, ONCE, i18n) {
+	async execute(message, args, guildSettings, ONCE, i18n) {
 		const { commands } = message.client;
 		// const slashCommands = message.client.slashCommands;
 		const prefix = guildSettings.prefix;

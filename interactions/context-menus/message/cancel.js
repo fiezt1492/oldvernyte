@@ -10,6 +10,11 @@ module.exports = {
 	async execute(interaction, message, i18n) {
 		const { client } = interaction;
 
+		if (message.author.id !== client.user.id) return await interaction.reply({
+				content: i18n.__("interactionCreate.owned"),
+				ephemeral: true,
+			});
+
 		if (message.components.length <= 0)
 			return await interaction.reply({
 				content: i18n.__("interactionCreate.missingComponents"),

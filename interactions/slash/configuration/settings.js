@@ -19,7 +19,7 @@ module.exports = {
 	guildOwner: true,
 	permissions: ["ADMINISTRATOR"],
 
-	async execute(interaction, Player, ONCE, i18n) {
+	async execute(interaction,  ONCE, i18n) {
 		const { client } = interaction;
 
 		// console.log(interaction);

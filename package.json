@@ -30,6 +30,7 @@
 		"node-fetch": "^2.6.1",
 		"path": "^0.12.7",
 		"pm2": "^5.1.2",
+		"randomstring": "^1.2.2",
 		"short-number": "^1.0.7",
 		"string-table": "^0.1.5",
 		"translate-google": "^1.5.0",

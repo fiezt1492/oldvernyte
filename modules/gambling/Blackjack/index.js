@@ -5,28 +5,7 @@ const { millify } = require("millify");
 
 // let games = new Map();
 
-module.exports = async (client, message, Player, ONCE, bet) => {
-	// const already = games.get(message.author.id);
-
-	// if (games.has(message.author.id) && already.cID == message.channel.id)
-	// 	return message.reply({
-	// 		content: "**[Error]** There is a blackjack game playing for you.",
-	// 		components: [
-	// 			{
-	// 				type: 1,
-	// 				components: [
-	// 					{
-	// 						type: 2,
-	// 						style: 5,
-	// 						label: "Forward",
-	// 						// url: `https://discord.com/channels/${already.gID}/${already.cID}/${already.mID}`
-	// 						url: already.mURL,
-	// 					},
-	// 				],
-	// 			},
-	// 		],
-	// 	});
-
+module.exports = async (client, message, ONCE, i18n, bet) => {
 	try {
 		const d = new Deck();
 		d.shuffle();
@@ -50,7 +29,9 @@ module.exports = async (client, message, Player, ONCE, bet) => {
 				name: client.user.tag,
 				iconURL: client.user.displayAvatarURL({ dynamic: true }),
 			})
-			.setDescription("Xì dách")
+			.setDescription(i18n.__mf("blackjack.deckEmbed.description.idle", {
+				owlet: string
+			}))
 			.setFooter({
 				text: message.author.tag,
 				iconURL: message.author.displayAvatarURL({ dynamic: true }),
@@ -59,25 +40,32 @@ module.exports = async (client, message, Player, ONCE, bet) => {
 		const staybut = (state) =>
 			new MessageButton()
 				.setCustomId("stay")
-				.setLabel("Stay")
+				.setLabel(i18n.__("blackjack.button.stay"))
 				.setDisabled(state)
 				.setStyle("DANGER");
 
 		const hitbut = (state) =>
 			new MessageButton()
 				.setCustomId("hit")
-				.setLabel("Hit")
+				.setLabel(i18n.__("blackjack.button.hit"))
 				.setDisabled(state)
 				.setStyle("SUCCESS");
 
 		deckEmbed
 			.addField(
-				`?? on ${client.user.username}\'s hand`,
+				i18n.__mf("blackjack.deckEmbed.title.idle", {
+					point: "??",
+					username: client.user.username
+				}),
 				`\`${dealer.cards[0].suit}${dealer.cards[0].value} | ${dealer.cards[1].suit}?\``,
 				true
 			)
 			.addField(
-				`${p1.point} on ${message.author.username}\'s hand`,
+				// `${p1.point} on ${message.author.username}\'s hand`,
+				i18n.__mf("blackjack.deckEmbed.title.idle", {
+					point: p1.point,
+					username: message.author.username
+				}),
 				p1hand,
 				true
 			);
@@ -103,12 +91,22 @@ module.exports = async (client, message, Player, ONCE, bet) => {
 				.join(" | ");
 
 			deckEmbed.fields[0] = {
-				name: `${dealer.point} on ${client.user.username}\'s hand`,
+				name: 
+				// `${dealer.point} on ${client.user.username}\'s hand`,
+				i18n.__mf("blackjack.deckEmbed.title.idle", {
+					point: dealer.point,
+					username: client.user.username
+				}),
 				value: dealerhand,
 				inline: true,
 			};
 			deckEmbed.fields[1] = {
-				name: `${p1.point} on ${message.author.username}\'s hand`,
+				name: 
+				// `${p1.point} on ${message.author.username}\'s hand`,
+				i18n.__mf("blackjack.deckEmbed.title.idle", {
+					point: p1.point,
+					username: message.author.username
+				}),
 				value: p1hand,
 				inline: true,
 			};
@@ -119,18 +117,22 @@ module.exports = async (client, message, Player, ONCE, bet) => {
 				(p1.is5D() && !dealer.is5D()) ||
 				(p1.is5D() && dealer.is5D() && p1.point < dealer.point)
 			) {
-				deckEmbed.setTitle("WIN");
-				await Player.owlet(bet);
-				deckEmbed.description = `You won \`${string}\` owlets!`;
+				deckEmbed.setTitle(i18n.__("blackjack.deckEmbed.title.win"));
+				await client.players.owlet(message.author.id, bet);
+				deckEmbed.description = i18n.__mf("blackjack.deckEmbed.description.win", {
+					owlet: string
+				});
 			} else if (
 				dealer.point === p1.point ||
 				(dealer.isBusted() && p1.isBusted())
 			) {
-				deckEmbed.setTitle("DRAW");
+				deckEmbed.setTitle(i18n.__("blackjack.deckEmbed.title.tied"));
 			} else {
-				deckEmbed.setTitle("LOSE");
-				await Player.owlet(-bet);
-				deckEmbed.description = `You lose \`${string}\` owlets!`;
+				deckEmbed.setTitle(i18n.__("blackjack.deckEmbed.title.lose"));
+				await client.players.owlet(message.author.id, -bet);
+				deckEmbed.description = i18n.__mf("blackjack.deckEmbed.description.lose",{
+					owlet: string
+				});
 			}
 		}
 
@@ -194,12 +196,22 @@ module.exports = async (client, message, Player, ONCE, bet) => {
 			}
 
 			deckEmbed.fields[0] = {
-				name: `?? on ${client.user.username}\'s hand`,
+				name: 
+				// `?? on ${client.user.username}\'s hand`,
+				i18n.__mf("blackjack.deckEmbed.title.idle", {
+					point: "??",
+					username: client.user.username
+				}),
 				value: `\`${dealer.cards[0].suit}${dealer.cards[0].value} | ${dealer.cards[1].suit}?\``,
 				inline: true,
 			};
 			deckEmbed.fields[1] = {
-				name: `${p1.point} on ${message.author.username}\'s hand`,
+				name: 
+				// `${p1.point} on ${message.author.username}\'s hand`,
+				i18n.__mf("blackjack.deckEmbed.title.idle", {
+					point: p1.point,
+					username: message.author.username
+				}),
 				value: p1hand,
 				inline: true,
 			};
@@ -222,16 +234,26 @@ module.exports = async (client, message, Player, ONCE, bet) => {
 					.join(" | ");
 
 				deckEmbed.fields[0] = {
-					name: `${dealer.point} on ${client.user.username}\'s hand`,
+					name: 
+					// `${dealer.point} on ${client.user.username}\'s hand`,
+					i18n.__mf("blackjack.deckEmbed.title.idle", {
+					point: "??",
+					username: client.user.username
+				}),
 					value: dealerhand,
 					inline: true,
 				};
 				deckEmbed.fields[1] = {
-					name: `${p1.point} on ${message.author.username}\'s hand`,
+					name: 
+					// `${p1.point} on ${message.author.username}\'s hand`,
+					i18n.__mf("blackjack.deckEmbed.title.idle", {
+					point: p1.point,
+					username: message.author.username
+				}),
 					value: p1hand,
 					inline: true,
 				};
-				deckEmbed.setTitle("TIMEOUT");
+				deckEmbed.setTitle(i18n.__("blackjack.deckEmbed.title.timeout"));
 				bt1 = staybut(true);
 				bt2 = hitbut(true);
 				row1 = new MessageActionRow().addComponents([bt1, bt2]);
@@ -262,12 +284,22 @@ module.exports = async (client, message, Player, ONCE, bet) => {
 				.join(" | ");
 
 			deckEmbed.fields[0] = {
-				name: `${dealer.point} on ${client.user.username}\'s hand`,
+				name: 
+				// `${dealer.point} on ${client.user.username}\'s hand`,
+				i18n.__mf("blackjack.deckEmbed.title.idle", {
+					point: dealer.point,
+					username: client.user.username
+				}),
 				value: dealerhand,
 				inline: true,
 			};
 			deckEmbed.fields[1] = {
-				name: `${p1.point} on ${message.author.username}\'s hand`,
+				name: 
+				// `${p1.point} on ${message.author.username}\'s hand`,
+				i18n.__mf("blackjack.deckEmbed.title.idle", {
+					point: p1.point,
+					username: message.author.username
+				}),
 				value: p1hand,
 				inline: true,
 			};
@@ -278,18 +310,22 @@ module.exports = async (client, message, Player, ONCE, bet) => {
 				(p1.is5D() && !dealer.is5D()) ||
 				(p1.is5D() && dealer.is5D() && p1.point > dealer.point)
 			) {
-				deckEmbed.setTitle("WIN 🎉");
-				await Player.owlet(bet);
-				deckEmbed.description = `You won \`${string}\` owlets!`;
+				deckEmbed.setTitle(i18n.__("blackjack.deckEmbed.title.win"));
+				await client.players.owlet(message.author.id, bet);
+				deckEmbed.description = i18n.__mf("blackjack.deckEmbed.description.win",{
+					owlet: string
+				});
 			} else if (
 				dealer.point === p1.point ||
 				(dealer.isBusted() && p1.isBusted())
 			) {
-				deckEmbed.setTitle("DRAW");
+				deckEmbed.setTitle(i18n.__("blackjack.deckEmbed.title.tied"));
 			} else {
-				deckEmbed.setTitle("LOSE :<");
-				await Player.owlet(-bet);
-				deckEmbed.description = `You lose \`${string}\` owlets!`;
+				deckEmbed.setTitle(i18n.__("blackjack.deckEmbed.title.lose"));
+				await client.players.owlet(message.author.id, -bet);
+				deckEmbed.description = i18n.__mf("blackjack.deckEmbed.description.lose",{
+					owlet: string
+				});
 			}
 
 			bt1 = staybut(true);

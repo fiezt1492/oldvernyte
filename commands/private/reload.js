@@ -9,8 +9,12 @@ module.exports = {
 	// args: true,
 	ownerOnly: true,
 
-	execute(message, args) {
+	async execute(message, args) {
 		const { client } = message
+
+    client.baseCardsList = await client.baseCards.getAll()
+		client.baseCasesList = await client.baseCards.getAll()
+    
 		let commandName;
 		if (!args[0]) {
 			client.commands.sweep(() => true);

@@ -3,7 +3,7 @@ const blackjack = require("../../modules/gambling/Blackjack/index");
 
 module.exports = {
 	name: "blackjack",
-	description: "Playing Vietnamese Blackjack",
+	description: "Play Vietnamese Blackjack",
 	category: "gambling",
 	aliases: ["bj"],
 	cooldown: 5,
@@ -12,16 +12,16 @@ module.exports = {
 	once: true,
 	permissions: "SEND_MESSAGES",
 
-	async execute(message, args, guildSettings, Player, ONCE) {
+	async execute(message, args, guildSettings, ONCE, i18n) {
 		const { client } = message;
 		const bet = Math.round(Number(args[0]))
 		if (isNaN(bet) || bet <= 0) return message.reply({
-			content: `Please provide a positive number!`
+			content: i18n.__("blackjack.error.positive")
 		})
-		const player = await Player.get()
+		const player = await client.players.get(message.author.id)
 		if (bet > player.owlet) return message.reply({
-			content: `You dont have enough owlet!`
+			content: i18n.__("blackjack.error.owlet")
 		})
-		await blackjack(client, message, Player, ONCE, bet);
+		await blackjack(client, message, ONCE, i18n, bet);
 	},
 };

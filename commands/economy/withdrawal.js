@@ -12,7 +12,7 @@ module.exports = {
 	ownerOnly: false,
 	permissions: ["SEND_MESSAGES"],
 
-	async execute(message, args, guildSettings, Player) {
+	async execute(message, args, guildSettings) {
 		const { client } = message;
 
         let input = Number(args[0])
@@ -20,13 +20,13 @@ module.exports = {
 			content: `Please provide a positive number!`
 		})
 
-		const player = await Player.get()
+		const player = await client.players.get(message.author.id)
 		
 		if (input > player.bank) return message.reply({
 			content: `You dont have enough owlet!`,
 		});
 
-		await Player.bank(-input)
+		await client.players.bank(message.author.id, -input)
 		const string = millify(input, {
 			precision: 2,  
 		  });

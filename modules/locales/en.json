@@ -8,6 +8,7 @@
 	},
 	"interactionCreate": {
 		"author": "This message is not for you!",
+		"owned": "I'm not the author of this message!",
 		"missingComponents": "This message doesn't have components!"
 	},
 	"messageCreate": {
@@ -16,6 +17,7 @@
 		"maintain": "This command is currently under maintenance. Please wait until we completely fixed it.",
 		"args": "You didn't provide any arguments!",
 		"usage": "\nThe proper usage would be: `{prefix}{command} {usage}`",
+		"mentions": "You didn't mention any user!",
 		"options": "\n```Usage:\n{options}```"
 	},
 	"ONCE": {
@@ -25,6 +27,34 @@
 	},
 	"onMention": {
 		"reply": "This guild prefix is `{prefix}`. Type `{prefix}help` to spawn help panel."
+	},
+	"blackjack": {
+		"description": "Play Vietnamese Blackjack",
+		"category": "gambling",
+		"usage": "[owlet]",
+		"button": {
+			"hit": "Hit",
+			"stay": "Stay"
+		},
+		"error": {
+			"positive": "Please provide a positive number!",
+			"owlet": "You dont have enough owlet!"
+		},
+		"deckEmbed": {
+			"title": {
+				"idle": "{point} on {username}'s hand",
+				"win": "WIN ^^",
+				"lose": "LOSE :L",
+				"tied": "ITED",
+				"timeout": "TIMEOUT"
+			},
+			"description": {
+				"idle": "Bet owlets: `{owlet}`",
+				"win": "You won `{owlet}` owlets!",
+				"lose": "You lost `{owlet}` owlets!"
+			},
+			"player": "blackjack.deckEmbed.player"
+		}
 	},
 	"help": {
 		"description": "List all commands of bot or info about a specific command.",

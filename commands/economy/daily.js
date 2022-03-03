@@ -14,10 +14,10 @@ module.exports = {
 	ownerOnly: false,
 	permissions: ["SEND_MESSAGES"],
 
-	async execute(message, args, guildSettings, Player) {
+	async execute(message, args, guildSettings) {
 		const { client } = message;
 
-		const mongoCD = await Player.cooldownsGet(this.name);
+		const mongoCD = await client.players.cooldownsGet(message.author.id, this.name);
 		if (mongoCD) {
 			if (Date.now() - mongoCD.timestamps < mongoCD.duration) {
 				return message.reply({
@@ -25,7 +25,7 @@ module.exports = {
 						(mongoCD.timestamps + mongoCD.duration) / 1000
 					)}:R>`,
 				});
-			} else await Player.cooldownsPull(this.name);
+			} else await client.players.cooldownsPull(message.author.id, this.name);
 		}
 
 		const Embed = new Discord.MessageEmbed()
@@ -77,8 +77,8 @@ module.exports = {
 			else random = Math.round(Math.random() * 999) + 1;
 			// console.log(random);
 			const string = millify(random);
-			await Player.cooldownsPush(this.name, 24 * 60 * 60 * 1000);
-			await Player.owlet(random);
+			await client.players.cooldownsPush(message.author.id, this.name, 24 * 60 * 60 * 1000);
+			await client.players.owlet(message.author.id, random);
 			Embed.title = "SUCCESS!";
 			Embed.color = "GREEN";
 			Embed.setDescription(`You received \`${string}\` owlets!`);

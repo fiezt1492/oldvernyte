@@ -3,7 +3,7 @@
 const { Collection } = require("discord.js");
 const { owner } = require("../config");
 // const mongo = require("../databases/mongo");
-const Players = require("../modules/economy/players");
+// const Players = require("../modules/economy/players");
 const Discord = require("discord.js");
 const ONCE = new Map();
 
@@ -28,6 +28,8 @@ module.exports = {
 		if (client.user.presence.status !== "online") return;
 
 		if (message.author.bot || message.channel.type === "dm") return;
+
+		if (client.banlist.includes(message.author.id)) return;
 
 		// require("../modules/util/message")(message)
 
@@ -59,7 +61,9 @@ module.exports = {
 
 		const [matchedPrefix] = content.toLowerCase().match(prefixRegex);
 
-		const args = content.slice(matchedPrefix.length).trim().split(/ +/);
+		let args = content.slice(matchedPrefix.length).trim().split(/ +/);
+
+		const mentions = [];
 
 		const commandName = args.shift().toLowerCase();
 
@@ -116,7 +120,7 @@ module.exports = {
 			}
 		}
 
-		if (command.ownerOnly && message.author.id !== owner) {
+		if (command.ownerOnly && !owner.includes(message.author.id)) {
 			return;
 		}
 
@@ -175,6 +179,16 @@ module.exports = {
 
 			return message.reply({ content: reply });
 		}
+
+		
+		if (message.mentions.users.size > 0) {
+			message.mentions.users.forEach(u => mentions.push(u.id))
+			args = args.filter((e) => !(e.startsWith(`<@`) && e.endsWith(`>`)));
+		}
+
+		if (command.mentions) {
+			if (mentions.length <= 0) return message.reply({ content: i18n.__mf("messageCreate.mentions") });
+		}
 		// else if (
 		// 	command.args &&
 		// 	args.length &&
@@ -225,16 +239,21 @@ module.exports = {
 
 		// execute the final command. Put everything above this.
 		try {
-			const Player = new Players(message.author.id);
-			const playersCategories = ["economy", "gambling"];
+			const playersCategories = ["economy", "gambling", "player"];
 
 			if (playersCategories.includes(command.category)) {
-				await Player.set();
+				await client.players.set(author.id)
+
+				if (message.mentions.users.size > 0) {
+					message.mentions.users.filter(u => !u.bot).forEach(async (u) => {
+						await client.players.set(u.id)
+					})
+				}
 			}
 
 			//mongo cooldown
 			if (command.mongoCD && command.mongoCD > 0) {
-				const mongoCD = await Player.cooldownsGet(command.name);
+				const mongoCD = await client.players.cooldownsGet(author.id, command.name);
 				if (mongoCD) {
 					if (Date.now() - mongoCD.timestamps < mongoCD.duration) {
 						return message.reply({
@@ -245,11 +264,11 @@ module.exports = {
 								),
 							}),
 						});
-					} else await Player.cooldownsPull(command.name);
-				} else await Player.cooldownsPush(command.name, command.mongoCD * 1000);
+					} else await client.players.cooldownsPull(author.id, command.name);
+				} else await client.players.cooldownsPush(author.id, command.name, command.mongoCD * 1000);
 			}
 
-			command.execute(message, args, guildSettings, Player, ONCE, i18n);
+			command.execute(message, args, guildSettings, ONCE, i18n, mentions);
 		} catch (error) {
 			console.error(error);
 			message.reply({

@@ -3,28 +3,21 @@ const { millify } = require("millify");
 const stringTable = require("string-table");
 
 module.exports = {
-	name: "guildleaderboard",
-	description: "Show your guild top players",
-	category: "economy",
-	aliases: ["guildtop", "guildleaderboards"],
+	name: "leaderboard",
+	description: "Show global top players",
+	category: "player",
+	aliases: ["top", "leaderboards"],
 	usage: "",
 	cooldown: 10,
 	args: false,
 	ownerOnly: false,
 	permissions: ["SEND_MESSAGES"],
 
-	async execute(message, args, guildSettings, Player) {
+	async execute(message, args, guildSettings) {
 		const { client, guild } = message;
     const db = await client.db.collection("players")
-    const ids = guild.members.cache
-      .filter((m) => !m.user.bot)
-      .map((m) => String(m.id))
       
-    const players = await db.find({
-      id: {
-        $in: ids
-      }
-    }).sort({
+    const players = await db.find().sort({
           owlet: -1,
           bank: -1
         }).limit(10).toArray()
@@ -51,7 +44,7 @@ module.exports = {
     const footer = `${message.author.tag} • #`
 
 		const Embed = new Discord.MessageEmbed()
-			.setTitle(`${guild.name}'s Top ${data.length}`)
+			.setTitle(`Global Top ${data.length}`)
 			.setColor("RANDOM")
 			.setDescription("```" + table + "```")
 			.setFooter({

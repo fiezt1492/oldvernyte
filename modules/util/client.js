@@ -1,7 +1,7 @@
-const Players = require("../economy/players");
+// const Players = require("../economy/players");
 const Discord = require("discord.js");
 
-module.exports = (client) => {
+module.exports = async (client) => {
 	client.sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
 	client.number = (input) =>
@@ -19,17 +19,17 @@ module.exports = (client) => {
 		return client.users.fetch(id);
 	};
 
-	client.bal = async (id) => {
-		const Player = new Players(id);
-		const player = await Player.get();
-		if (!player) return null;
-		const bal = {
-			owlet: player.owlet,
-			nyteGem: player.nyteGem,
-			bank: player.bank,
-		};
-		return bal;
-	};
+	// client.bal = async (id) => {
+	// 	const Player = new Players(id);
+	// 	const player = await Player.get();
+	// 	if (!player) return null;
+	// 	const bal = {
+	// 		owlet: player.owlet,
+	// 		nyteGem: player.nyteGem,
+	// 		bank: player.bank,
+	// 	};
+	// 	return bal;
+	// };
 
 	client.disableComponent = (message, state = true) => {
 		if (!message) return [];
@@ -73,8 +73,24 @@ module.exports = (client) => {
 		// console.log(COMPONENTS)
 		return COMPONENTS;
 	};
+	client.players = require("../economy/players")
+  client.baseCards = require("../economy/baseCards")
+  client.baseCases = require("../economy/baseCases")
+  client.cards = require("../economy/cards")
+  client.cases = require("../economy/cases")
+  // client.backpacks = require("../economy/backpacks")
+  client.prefix = require("../configuration/guildPrefix")
+	client.locale = require("../configuration/guildLocale")
+	client.banlistGet = require("./banlist.js")
+  client.admin = require("./admin.js")
+  
+	// client.baseCardsList = await client.baseCards.getAll()
+	// client.baseCasesList = await client.baseCases.getAll()
 
-	client.prefix = require("../configuration/guildPrefix");
+  client.rarities = ['c', 'uc', 'r', 'sr', 'ssr', 'ur', 'e', 'l']
+	client.elements = ['fire', 'water', 'metal', 'earth', 'herb']
+	
+  // client.listCreate = require("./listCreate")
 
-	client.locale = require("../configuration/guildLocale");
+	
 };

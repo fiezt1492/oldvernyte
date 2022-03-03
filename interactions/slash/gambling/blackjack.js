@@ -22,42 +22,24 @@ module.exports = {
 	category: "gambling",
 	permissions: "SEND_MESSAGES",
 
-	async execute(interaction, Player, ONCE) {
+	async execute(interaction, ONCE, i18n) {
 		const { client } = interaction;
 
-		// const already = games.get(interaction.user.id);
-
-		// if (games.has(interaction.user.id) && already.cID == interaction.channelId)
-		// 	return interaction.reply({
-		// 		content: "**[Error]** There is a blackjack game playing for you.",
-		// 		components: [
-		// 			{
-		// 				type: 1,
-		// 				components: [
-		// 					{
-		// 						type: 2,
-		// 						style: 5,
-		// 						label: "Forward",
-		// 						// url: `https://discord.com/channels/${already.gID}/${already.cID}/${already.mID}`
-		// 						url: already.mURL,
-		// 					},
-		// 				],
-		// 			},
-		// 		],
-		// 		ephemeral: true,
-		// 	});
-
-		// await interaction.reply({
-		// 	content: `Creating game`,
-		// });
+		
 
 		// const message = await interaction.fetchReply();
 		const bet = interaction.options.getInteger("bet");
 		if (bet <= 0)
 			return interaction.reply({
-				content: `Please provide a positive number!`,
+				content:  i18n.__("blackjack.error.positive"),
 				ephemeral: true,
 			});
+
+		const player = await client.players.get(interaction.user.id)
+		if (bet > player.owlet) return interaction.reply({
+			content: i18n.__("blackjack.error.owlet"),
+			ephemeral: true,
+		})
 
 		try {
 			const d = new Deck();
@@ -82,7 +64,9 @@ module.exports = {
 					name: client.user.tag,
 					iconURL: client.user.displayAvatarURL({ dynamic: true }),
 				})
-				.setDescription("Xì dách")
+				.setDescription(i18n.__mf("blackjack.deckEmbed.description.idle", {
+					owlet: String(bet)
+				}))
 				.setFooter({
 					text: interaction.user.tag,
 					iconURL: interaction.user.displayAvatarURL({ dynamic: true }),
@@ -91,25 +75,31 @@ module.exports = {
 			const staybut = (state) =>
 				new MessageButton()
 					.setCustomId("stay")
-					.setLabel("Stay")
+					.setLabel(i18n.__("blackjack.button.stay"))
 					.setDisabled(state)
 					.setStyle("DANGER");
 
 			const hitbut = (state) =>
 				new MessageButton()
 					.setCustomId("hit")
-					.setLabel("Hit")
+					.setLabel(i18n.__("blackjack.button.hit"))
 					.setDisabled(state)
 					.setStyle("SUCCESS");
 
 			deckEmbed
 				.addField(
-					`?? on ${client.user.username}\'s hand`,
+					i18n.__mf("blackjack.deckEmbed.title.idle", {
+						point: "??",
+						username: client.user.username
+					}),
 					`\`${dealer.cards[0].suit}${dealer.cards[0].value} | ${dealer.cards[1].suit}?\``,
 					true
 				)
 				.addField(
-					`${p1.point} on ${interaction.user.username}\'s hand`,
+					i18n.__mf("blackjack.deckEmbed.title.idle", {
+						point: p1.point,
+						username: interaction.user.username
+					}),
 					p1hand,
 					true
 				);
@@ -136,12 +126,21 @@ module.exports = {
 					.join(" | ");
 
 				deckEmbed.fields[0] = {
-					name: `${dealer.point} on ${client.user.username}\'s hand`,
+					name: 
+					// `${dealer.point} on ${client.user.username}\'s hand`,
+					i18n.__mf("blackjack.deckEmbed.title.idle", {
+						point: dealer.point,
+						username: client.user.username
+					}),
 					value: dealerhand,
 					inline: true,
 				};
 				deckEmbed.fields[1] = {
-					name: `${p1.point} on ${interaction.user.username}\'s hand`,
+					name: 
+					i18n.__mf("blackjack.deckEmbed.title.idle", {
+						point: p1.point,
+						username: interaction.user.username
+					}),
 					value: p1hand,
 					inline: true,
 				};
@@ -152,18 +151,22 @@ module.exports = {
 					(p1.is5D() && !dealer.is5D()) ||
 					(p1.is5D() && dealer.is5D() && p1.point < dealer.point)
 				) {
-					deckEmbed.setTitle("WIN");
-					await Player.owlet(bet);
-					deckEmbed.description = `You won \`${string}\` owlets!`;
+					deckEmbed.setTitle(i18n.__("blackjack.deckEmbed.title.win"));
+					await client.players.owlet(interaction.user.id, bet);
+					deckEmbed.description = i18n.__mf("blackjack.deckEmbed.description.win", {
+						owlet: string
+					});
 				} else if (
 					dealer.point === p1.point ||
 					(dealer.isBusted() && p1.isBusted())
 				) {
-					deckEmbed.setTitle("DRAW");
+					deckEmbed.setTitle(i18n.__("blackjack.deckEmbed.title.tied"));
 				} else {
-					deckEmbed.setTitle("LOSE");
-					await Player.owlet(-bet);
-					deckEmbed.description = `You lose \`${string}\` owlets!`;
+					deckEmbed.setTitle(i18n.__("blackjack.deckEmbed.title.lose"));
+					await client.players.owlet(interaction.user.id, -bet);
+					deckEmbed.description = i18n.__mf("blackjack.deckEmbed.description.lose", {
+						owlet: string
+					});
 				}
 			}
 
@@ -230,12 +233,20 @@ module.exports = {
 				}
 
 				deckEmbed.fields[0] = {
-					name: `?? on ${client.user.username}\'s hand`,
+					name: 
+					i18n.__mf("blackjack.deckEmbed.title.idle", {
+						point: "??",
+						username: client.user.username
+					}),
 					value: `\`${dealer.cards[0].suit}${dealer.cards[0].value} | ${dealer.cards[1].suit}?\``,
 					inline: true,
 				};
 				deckEmbed.fields[1] = {
-					name: `${p1.point} on ${interaction.user.username}\'s hand`,
+					name: 
+					i18n.__mf("blackjack.deckEmbed.title.idle", {
+						point: p1.point,
+						username: interaction.user.username
+					}),
 					value: p1hand,
 					inline: true,
 				};
@@ -258,16 +269,26 @@ module.exports = {
 						.join(" | ");
 
 					deckEmbed.fields[0] = {
-						name: `${dealer.point} on ${client.user.username}\'s hand`,
+						name: 
+						// `${dealer.point} on ${client.user.username}\'s hand`,
+						i18n.__mf("blackjack.deckEmbed.title.idle", {
+							point: dealer.point,
+							username: client.user.username
+						}),
 						value: dealerhand,
 						inline: true,
 					};
 					deckEmbed.fields[1] = {
-						name: `${p1.point} on ${interaction.user.username}\'s hand`,
+						name: 
+						// `${p1.point} on ${interaction.user.username}\'s hand`,
+						i18n.__mf("blackjack.deckEmbed.title.idle", {
+							point: p1.point,
+							username: client.user.username
+						}),
 						value: p1hand,
 						inline: true,
 					};
-					deckEmbed.setTitle("TIMEOUT");
+					deckEmbed.setTitle(i18n.__("blackjack.deckEmbed.title.timeout"));
 					bt1 = staybut(true);
 					bt2 = hitbut(true);
 					row1 = new MessageActionRow().addComponents([bt1, bt2]);
@@ -298,12 +319,22 @@ module.exports = {
 					.join(" | ");
 
 				deckEmbed.fields[0] = {
-					name: `${dealer.point} on ${client.user.username}\'s hand`,
+					name: 
+					// `${dealer.point} on ${client.user.username}\'s hand`,
+					i18n.__mf("blackjack.deckEmbed.title.idle", {
+						point: dealer.point,
+						username: client.user.username
+					}),
 					value: dealerhand,
 					inline: true,
 				};
 				deckEmbed.fields[1] = {
-					name: `${p1.point} on ${interaction.user.username}\'s hand`,
+					name: 
+					// `${p1.point} on ${interaction.user.username}\'s hand`,
+					i18n.__mf("blackjack.deckEmbed.title.idle", {
+						point: p1.point,
+						username: interaction.user.username
+					}),
 					value: p1hand,
 					inline: true,
 				};
@@ -314,18 +345,22 @@ module.exports = {
 					(p1.is5D() && !dealer.is5D()) ||
 					(p1.is5D() && dealer.is5D() && p1.point > dealer.point)
 				) {
-					deckEmbed.setTitle("WIN");
-					await Player.owlet(bet);
-					deckEmbed.description = `You won \`${string}\` owlets!`;
+					deckEmbed.setTitle(i18n.__("blackjack.deckEmbed.title.win"));
+					await client.players.owlet(interaction.user.id, bet);
+					deckEmbed.description = i18n.__mf("blackjack.deckEmbed.description.win",{
+					owlet: string
+				});
 				} else if (
 					dealer.point === p1.point ||
 					(dealer.isBusted() && p1.isBusted())
 				) {
-					deckEmbed.setTitle("DRAW");
+					deckEmbed.setTitle(i18n.__("blackjack.deckEmbed.title.tied"));
 				} else {
-					deckEmbed.setTitle("LOSE");
-					await Player.owlet(-bet);
-					deckEmbed.description = `You lose \`${string}\` owlets!`;
+					deckEmbed.setTitle(i18n.__("blackjack.deckEmbed.title.lose"));
+					await client.players.owlet(interaction.user.id, -bet);
+					deckEmbed.description = i18n.__mf("blackjack.deckEmbed.description.lose",{
+					owlet: string
+				});
 				}
 
 				bt1 = staybut(true);
@@ -348,6 +383,7 @@ module.exports = {
 			});
 		} catch (error) {
 			console.log("[BLACKJACK]: " + error.message);
+			console.log(error)
 		}
 	},
 };

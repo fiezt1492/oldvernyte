@@ -3,7 +3,7 @@ const Discord = require("discord.js");
 module.exports = {
 	name: "redeem",
 	description: "redeem a giftcode",
-	category: "economy",
+	category: "player",
 	aliases: [],
 	usage: "[giftcode]",
 	cooldown: 5,
@@ -12,7 +12,7 @@ module.exports = {
 	once: false,
 	permissions: ["SEND_MESSAGES"],
 
-	async execute(message, args, guildSettings, Player, ONCE) {
+	async execute(message, args, guildSettings, ONCE) {
 		const { client } = message;
 		const db = client.db.collection("giftcode");
 
@@ -35,7 +35,7 @@ module.exports = {
 
 		let o = code.prize.owlet || 10;
 
-		await Player.owlet(o);
+		await client.players.owlet(message.author.id, o);
 
 		await db.updateOne(
 			{

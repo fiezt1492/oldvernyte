@@ -11,7 +11,7 @@ module.exports = {
 	ownerOnly: false,
 	permissions: ["SEND_MESSAGES"],
 
-	async execute(message, args, guildSettings, Player) {
+	async execute(message, args, guildSettings) {
 		const { client, guild } = message;
 		// console.log(guild);
 		const owner = await guild.members.fetch(guild.ownerId);

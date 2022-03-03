@@ -1,7 +1,6 @@
 const Discord = require("discord.js");
 // const shortNumber = require("short-number");
 const { millify } = require("millify");
-const Players = require("../../modules/economy/players");
 
 module.exports = {
 	name: "balance",
@@ -14,11 +13,14 @@ module.exports = {
 	ownerOnly: false,
 	permissions: ["SEND_MESSAGES"],
 
-	async execute(message, args, guildSettings, Player) {
+	async execute(message, args, guildSettings, ONCE, i18n, mentions) {
 		const { client } = message;
 		const member = message.mentions.users.first() || message.author
-		const Target = new Players(member.id);
-		const player = await Target.set();
+		// const Target = new Players(member.id);
+		const player = await client.players.get(member.id);
+		if (!player) return message.reply({
+			content: i18n.__("common.error")
+		})
 		const { owlet, nyteGem, bank } = player;
 
 		const string = {

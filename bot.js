@@ -57,7 +57,6 @@ for (const file of eventFiles) {
 // Define Collection of Commands, Slash Commands and cooldowns
 
 const keepAlive = require("./server");
-require("./modules/util/client")(client);
 
 client.i18n = require("./modules/util/i18n")
 client.db = require("./databases/mongo.js");
@@ -71,6 +70,8 @@ client.selectCommands = new Collection();
 client.contextCommands = new Collection();
 client.cooldowns = new Collection();
 client.triggers = new Collection();
+
+require("./modules/util/client")(client);
 
 /**********************************************************************/
 // Registration of Message-Based Commands

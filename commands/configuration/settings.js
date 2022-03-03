@@ -17,7 +17,7 @@ module.exports = {
 	guildOwner: true,
 	permissions: ["ADMINISTRATOR"],
 
-	async execute(message, args, guildSettings, Player, ONCE, i18n) {
+	async execute(message, args, guildSettings, ONCE, i18n) {
 		const { client } = message;
 		const Embed = new Discord.MessageEmbed()
 			.setTitle("Guild Settings Panel")

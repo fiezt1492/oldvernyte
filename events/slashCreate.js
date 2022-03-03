@@ -1,7 +1,7 @@
 // const { Collection } = require("discord.js");
 const Discord = require("discord.js");
 const { prefix, owner } = require("../config");
-const Players = require("../modules/economy/players");
+// const Players = require("../modules/economy/players");
 const ONCE = new Map();
 
 module.exports = {
@@ -107,15 +107,15 @@ module.exports = {
 		}
 
 		try {
-			const Player = new Players(interaction.user.id);
+			// const Player = new Players(interaction.user.id);
 			const playersCategories = ["economy", "gambling"];
 
 			if (command.category && playersCategories.includes(command.category)) {
-				await Player.set();
+				await client.players.set(interaction.user.id);
 			}
 
 			if (command.mongoCD && command.mongoCD > 0) {
-				const mongoCD = await Player.cooldownsGet(command.name);
+				const mongoCD = await client.players.cooldownsGet(interaction.user.id,command.name);
 				if (mongoCD) {
 					if (Date.now() - mongoCD.timestamps < mongoCD.duration) {
 						return interaction.reply({
@@ -127,11 +127,11 @@ module.exports = {
 							}),
 							ephemeral: true,
 						});
-					} else await Player.cooldownsPull(command.name);
-				} else await Player.cooldownsPush(command.name, command.mongoCD * 1000);
+					} else await client.players.cooldownsPull(interaction.user.id, command.name);
+				} else await client.players.cooldownsPush(interaction.user.id, command.name, command.mongoCD * 1000);
 			}
 
-			await command.execute(interaction, Player, ONCE, i18n);
+			await command.execute(interaction, ONCE, i18n);
 		} catch (err) {
 			console.error(err);
 			await interaction.reply({

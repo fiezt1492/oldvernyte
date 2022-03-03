@@ -15,7 +15,7 @@ module.exports = {
 	permissions: "SEND_MESSAGES",
 	// maintain: true,
 
-	async execute(message, args, guildSettings, Player, ONCE) {
+	async execute(message, args, guildSettings, ONCE) {
 		const { client } = message;
 
 		// const already = games.get(message.author.id);
@@ -44,7 +44,7 @@ module.exports = {
 			return message.reply({
 				content: `Please provide a positive number!`,
 			});
-		const player = await Player.get();
+		const player = await client.players.get(message.author.id);
 		if (bet > player.owlet)
 			return message.reply({
 				content: `You dont have enough owlet!`,
@@ -217,7 +217,7 @@ module.exports = {
 			});
 
 			Embed.title = `You LOSE ${string} owlets!`;
-			await Player.owlet(bet);
+			await client.players.owlet(message.author.id, bet);
 
 			if (result > 0) {
 				Embed.title = `You WON ${string} owlets!`;

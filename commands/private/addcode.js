@@ -12,7 +12,7 @@ module.exports = {
 	once: false,
 	permissions: ["SEND_MESSAGES"],
 
-	async execute(message, args, guildSettings, Player, ONCE) {
+	async execute(message, args, guildSettings, ONCE) {
 		const { client } = message;
 
 		const db = client.db.collection("giftcode");

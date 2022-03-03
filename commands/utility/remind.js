@@ -11,7 +11,7 @@ module.exports = {
 	ownerOnly: true,
 	permissions: ["SEND_MESSAGES"],
 
-	async execute(message, args, guildSettings, Player) {
+	async execute(message, args, guildSettings) {
 		const { client, guild } = message;
 		const presence = guild.presences.cache.get(message.author.id);
         // console.log(presence)

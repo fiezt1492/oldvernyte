@@ -9,6 +9,10 @@ module.exports = {
 		// client.user.setPresence({})
 		const rDB = client.db.collection("restart");
 		const gDB = client.db.collection("guildSettings");
+		
+		client.maxHp = await client.admin.getMaxHp()
+		client.baseCardsList = await client.baseCards.getAll()
+		// client.baseCasesList = await client.baseCards.getAll()
 
 		const restarted = await rDB.findOne({ uID: "445102575314927617" });
 
@@ -20,7 +24,53 @@ module.exports = {
 		}
 
 		try {
+			const guildIds = await client.guilds.cache.map((guild) => guild.id);
+
+			client.banlist = await require("../modules/util/banlist")(client)
+
+      const guilds = await gDB.find(
+        {
+          gID: {
+            $in: guildIds
+          },
+        },
+        {
+          prefix: 1,
+          locale: 1,
+        }
+      ).toArray();
+
+      guildIds.forEach((guildId) => {
+        const guild = guilds.find((g) => g.id === guildId)
+
+        client.guildSettings.set(guildId, {
+                prefix: guild
+                  ? guild.prefix
+                    ? guild.prefix
+                    : defaultPrefix
+                  : defaultPrefix,
+                locale: guild ? (guild.locale ? guild.locale : "en") : "en",
+              });
+
+        if (guildIds.indexOf(guildId) === guildIds.length - 1) {
+					client.ready = true;
+				}
+      })
+		} catch (error) {
+			console.log(error);
+
 			client.user.setPresence({
+				status: "idle",
+				afk: false,
+				activities: [
+					{
+						name: `${prefix}help | Error`,
+						type: 0,
+					},
+				],
+			});
+		} finally {
+      client.user.setPresence({
 				status: "online",
 				afk: false,
 				activities: [
@@ -30,47 +80,7 @@ module.exports = {
 					},
 				],
 			});
-
-			const guilds = await client.guilds.cache.map((guild) => guild.id);
-
-			guilds.forEach(async (id) => {
-				const guild = await gDB.findOne(
-					{
-						gID: id,
-					},
-					{
-						prefix: 1,
-						locale: 1,
-					}
-				);
-
-				client.guildSettings.set(id, {
-					prefix: guild
-						? guild.prefix
-							? guild.prefix
-							: defaultPrefix
-						: defaultPrefix,
-					locale: guild ? (guild.locale ? guild.locale : "en") : "en",
-				});
-
-				if (guilds.indexOf(id) === guilds.length - 1) {
-					client.ready = true;
-				}
-			});
-		} catch (error) {
-			console.log(error);
-
-			client.user.setPresence({
-				status: "idle",
-				afk: false,
-				activities: [
-					{
-						name: `${prefix}help | Testing with bugs`,
-						type: 0,
-					},
-				],
-			});
-		}
+    }
 
 		console.log(`Ready! Logged in as ${client.user.tag}`);
 	},
