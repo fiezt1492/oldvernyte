@@ -1,5 +1,17 @@
-const { MongoClient } = require('mongodb')
-const client = new MongoClient(process.env.MONGO_CONNECT);
-client.connect().then(() => console.log("Mongo Connected!"))
+const mongoose = require("mongoose");
 
-module.exports = client.db('owlvernyte')
+module.exports =  async (dbURL) => {
+  try {
+    await mongoose.connect(dbURL, {
+    //   useCreateIndex: true,
+      useNewUrlParser: true,
+      useUnifiedTopology: true,
+    //   useFindAndModify: false,
+    });
+
+    console.log(`[MONGO] Database connected`);
+  } catch (error) {
+    console.log("[MONGO] Error: " + error.message);
+    process.exit(1);
+  }
+};

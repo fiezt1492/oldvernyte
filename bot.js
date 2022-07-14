@@ -59,7 +59,7 @@ for (const file of eventFiles) {
 const keepAlive = require("./server");
 
 client.i18n = require("./modules/util/i18n")
-client.db = require("./databases/mongo.js");
+client.db = require("./databases/Schemas.js");
 client.guildSettings = new Collection();
 client.commands = new Collection();
 client.ready = false;
